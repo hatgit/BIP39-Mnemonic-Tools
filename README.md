@@ -3,7 +3,7 @@ A simple python program for generating valid BIP39 mnemonics
 
 
 
-#Description: 
+Description: 
 A simplified python program for generating
 valid bip39 mnemonics, using an initial random entropy via the
 secrets module in Python for cryptographically secure entropy,
@@ -13,14 +13,14 @@ number of bits from the hash digest in order to compute the
 checksum and complete the final groups of words shows as 11 bit strings
 that correspond to an index value for a word as per the bip39 spec.
 
-#Formula: 
+Formula: 
 Initial Entropy in bits /32 = checksum length in bits
 initial entropy mod 11 = remaining bits + checksum = last word
 Initial entropy + checksum = total bits /11 = total words. 
 Example usage: 128 bits entropy, will require a 4 bit checksum,
 for a total of 132 bits.
 
-#Notes: 
+Notes: 
 While this code could be re-written to further condense/clean it,
 my goal was initially just to get it to work. For example, starting with the
 secret.randbits() function, I noticed often the value returned was less
