@@ -25,11 +25,7 @@ secret.randbits() function, I noticed often the value returned was less
 than the range specified even using rangebelow(), so I went a few bits higher in length
 to help assure that I got at least 129 bits (or 130) and then from there
 slice at least 128 bits to obtain the desired starting amount of entorpy neeeded.
-In addition,there is a bytearray error that sometimes throws if their is an odd number
-of bytes in the array, which was related to scenarios where 129 bits was used instead of 128
-for example. That error should now be resolved  - and namely - after formatting
-the initial entropy decimal number as a string then appending 0b to ensure it is treated
-as a binary value prior to conversion in subsequent steps.
+
 
 '''
 
