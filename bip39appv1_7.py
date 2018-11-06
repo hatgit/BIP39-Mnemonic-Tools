@@ -102,21 +102,9 @@ def print_words(indices):
     # print(bip39wordlist)
     # print(len(bip39wordlist))
     # wordindexes=for i in indices
-    First = indices[0]
-    Second = indices[1]
-    Third = indices[2]
-    Fourth = indices[3]
-    Fifth = indices[4]
-    Sixth = indices[5]
-    Seventh = indices[6]
-    Eigth = indices[7]
-    Ninth = indices[8]
-    Tenth = indices[9]
-    Eleventh = indices[10]
-    Twelfth = indices[11]
-
-    print(bip39wordlist[First], bip39wordlist[Second], bip39wordlist[Third], bip39wordlist[Fourth], bip39wordlist[Fifth], bip39wordlist[Sixth], bip39wordlist[Seventh], bip39wordlist[Eigth], bip39wordlist[Ninth], bip39wordlist[Tenth], bip39wordlist[Eleventh], bip39wordlist[Twelfth])
-
+    words = [bip39wordlist[indices[i]] for i in range(0, 12)]
+    word_string = ' '.join(words)
+    print(word_string)
 
 bip39wordlist = [
     "abandon",
