@@ -47,7 +47,6 @@ def generate_entropy():
     ent_dec = ent_dec[:128]  # *use only bits required from the initial random number
     print('Initial entropy:', ent_dec)  # print the entire string of bits to be used
     print('Length of initial entropy:', len(ent_dec))  # print the length of the string
-    ent_decpad = str('0b') + str(ent_dec)  # *append 0b pad so the number is treated as binary and not base 10
     print('Initial entropy as hex:', hex(int(ent_dec, 2)))  # print initial string as hexidecimal base 16
     print('Length of entropy as hex:', len((hex(int(ent_dec, 2)))))  # print length of hex string
     return ent_dec
