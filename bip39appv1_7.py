@@ -12,7 +12,7 @@ and as a bytearray before hashing to obtain the leading required
 number of bits from the hash digest in order to compute the
 checksum and complete the final word group.
 
-Formula: Initial Entropy in bits /32 = checksum length in bits
+Formula: Initial entropy in bits /32 = checksum length in bits
 initial entropy mod 11 = remaining bits + checksum = last word
 Initial entropy + checksum = total bits /11 = total words.
 
@@ -38,37 +38,37 @@ import binascii
 
 ent_dec = format(secrets.randbits(130), '0129b')  # *get a minimum of x bits
 ent_dec = ent_dec[:128]  # *use only bits required from the initial random number
-print('Initial Ent:', ent_dec)  # print the entire string of bits to be used
-print('Length of Initial Ent:', len(ent_dec))  # print the length of the string
+print('Initial entropy:', ent_dec)  # print the entire string of bits to be used
+print('Length of initial entropy:', len(ent_dec))  # print the length of the string
 ent_decpad = str('0b') + str(ent_dec)  # *append 0b pad so the number is treated as binary and not base 10
-print('Initial Ent as hex:', hex(int(ent_dec, 2)))  # print initial string as hexidecimal base 16
-print('Length of Ent as hex:', len((hex(int(ent_dec, 2)))))  # print length of hex string
+print('Initial entropy as hex:', hex(int(ent_dec, 2)))  # print initial string as hexidecimal base 16
+print('Length of entropy as hex:', len((hex(int(ent_dec, 2)))))  # print length of hex string
 
 ent_hex = (hex(int(ent_dec, 2)))  # assign hex string to ent_hex variable
 
 ent_hex_nopad = ent_hex[2:]  # removing leading 0x hex pad
 
-print('Ent length as hex w/ no 0x pad:', len(ent_hex_nopad))  # prints length without 0x pad
-print('Initial Ent as hex w/ no pad:', hex(int(ent_dec, 2))[2:])  # print string without 0x pad
+print('Entropy length as hex without 0x pad:', len(ent_hex_nopad))  # prints length without 0x pad
+print('Initial entropy as hex without pad:', hex(int(ent_dec, 2))[2:])  # print string without 0x pad
 
 array = bytearray.fromhex(ent_hex_nopad)  # *convert no padded hex string to bytearray
-print(array, '<--- Entropy as Bytes')  # print array as bytes in bytearray()
-print('Length of Initial Ent as bytearray:', len(array))  # print length of bytearray
+print(array, '<--- Entropy as bytes')  # print array as bytes in bytearray()
+print('Length of initial entropy as bytearray:', len(array))  # print length of bytearray
 
 bits = hashlib.sha256(array).hexdigest()  # *compute the sha256 hash of the bytearray as a hex digest
 
-print(bits, '<--- SHA256 Hash digest of entropy bytes')  # print the hash digest of the bytearray
+print(bits, '<--- SHA-256 hash digest of entropy bytes')  # print the hash digest of the bytearray
 bit = bits[0:1]  # *take first x bit of bits (x is not defined but be added to slice manually)
 
-print(bit, '<--- partial fragment of initial "byte"of hash')  # print first part of hash used for bits
+print(bit, '<--- Partial fragment of initial "byte" of hash')  # print first part of hash used for bits
 print((bit[0:1]), '<--- First n bits of hash to convert to hex')  # print needed bits from
 
 checkb = (bin(int(bit, 16)))  # converts hex to binary
 checksum = (format(int(checkb, 2), '04b'))
 print(format(int(checkb, 2), '04b'), '<--- Checksum (hex to bits)')  # ensures length is 4 so zero pad isn't dropped on small numbers
 
-print('Initial Ent + checksum = Total Bits:', str(ent_dec) + str(checksum))  # convert entropy to binary string
-print('length of Total bits:', len(str(ent_dec) + str(checksum)))  # print length of total bits
+print('Initial entropy + checksum = total bits:', str(ent_dec) + str(checksum))  # convert entropy to binary string
+print('Length of total bits:', len(str(ent_dec) + str(checksum)))  # print length of total bits
 
 
 s = (ent_dec) + str(checksum)  # adds checksum to end of string lengthening it deterministically.
@@ -83,8 +83,8 @@ print('Optional backup hex:', ent_hex)
 
 totalbits = hex(int(str('0b') + str(ent_dec) + str(checksum), 2))
 
-print('Optional backup hex w/ checksum:', totalbits)
-print('hash digest of init ent bytes:', bits)
+print('Optional backup hex with checksum:', totalbits)
+print('Hash digest of initial entropy bytes:', bits)
 
 # lookup = [s[i:i + 11] for i in range(0,len(s),11)]
 padgroup = [int(str('0b') + s[i:i + 11], 2) for i in range(0, len(s), 11)]  # (str('0b') for i in range(0,len(s),11))
