@@ -67,29 +67,32 @@ def ask_entropy(generated_bit_count):
         return generate_entropy(generated_bit_count)
     while len(entropy_string) != generated_char_count + 2:
         entropy_string = input(input_string)
-    entropy_binary = bin(int(entropy_string, 16))[2:].zfill(generated_bit_count)
-    print(entropy_binary)
+    entropy_binary = int_to_padded_binary(int(entropy_string, 16), generated_bit_count)
     return entropy_binary
 
 
 def generate_entropy(generated_bit_count):
-    print(generated_bit_count)
-    entropy = format(secrets.randbits(generated_bit_count + 2), '0129b')  # *get a minimum of x bits
-    entropy = entropy[:generated_bit_count]  # *use only bits required from the initial random number
-    print('Initial entropy:', entropy)  # print the entire string of bits to be used
-    print('Length of initial entropy:', len(entropy))  # print the length of the string
-    print('Initial entropy as hex:', hex(int(entropy, 2)))  # print initial string as hexidecimal base 16
-    print('Length of entropy as hex:', len((hex(int(entropy, 2)))))  # print length of hex string
-    return entropy
+    generated_char_count = generated_bit_count // 4
+    entropy = secrets.randbits(generated_bit_count)  # generate bits
+    entropy_binary = int_to_padded_binary(entropy, generated_bit_count)  # convert entropy to binary
+    print('Initial entropy:', entropy_binary)  # print the entire string of bits to be used
+    print('Length of initial entropy:', len(entropy_binary))  # print the length of the string
+    entropy_hex = binary_to_padded_hex(entropy_binary, generated_char_count)
+    print('Initial entropy as hex:', entropy_hex)  # print initial string as hexidecimal base 16
+    print('Length of entropy as hex:', len(entropy_hex))  # print length of hex string
+    return entropy_binary
 
 
 def get_hash(entropy):
-    entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
+    generated_bit_count = len(entropy)
+    generated_char_count = generated_bit_count // 4
+    print('gcc:', generated_char_count)
+    entropy_hex = binary_to_padded_hex(entropy, generated_char_count)  # assign hex string to entropy_hex variable
 
     entropy_hex_no_padding = entropy_hex[2:]  # removing leading 0x hex pad
 
     print('Entropy length as hex without 0x pad:', len(entropy_hex_no_padding))  # prints length without 0x pad
-    print('Initial entropy as hex without pad:', hex(int(entropy, 2))[2:])  # print string without 0x pad
+    print('Initial entropy as hex without pad:', entropy_hex_no_padding)  # print string without 0x pad
 
     entropy_bytearray = bytearray.fromhex(entropy_hex_no_padding)  # *convert no padded hex string to bytearray
     print(entropy_bytearray, '<--- Entropy as bytes')  # print array as bytes in bytearray()
@@ -101,16 +104,18 @@ def get_hash(entropy):
 
 
 def pick_words(entropy, entropy_hash, checksum_bit_count):
-    entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
+    generated_bit_count = len(entropy)
+    generated_char_count = generated_bit_count // 4
+    entropy_hex = binary_to_padded_hex(entropy, generated_char_count)  # assign hex string to entropy_hex variable
     checksum_char_count = checksum_bit_count // 4
     bit = entropy_hash[0:checksum_char_count]  # *take first x bit of bits (x is not defined but be added to slice manually)
 
     print(bit, '<--- Partial fragment of initial "byte" of hash')  # print first part of hash used for bits
     print((bit[0:checksum_char_count]), '<--- First n bits of hash to convert to hex')  # print needed bits from
 
-    check_bit = (bin(int(bit, 16)))  # converts hex to binary
-    checksum = (format(int(check_bit, 2), '04b'))
-    print(format(int(check_bit, 2), '04b'), '<--- Checksum (hex to bits)')  # ensures length is 4 so zero pad isn't dropped on small numbers
+    check_bit = int(bit, 16)  # converts hex to binary
+    checksum = int_to_padded_binary(check_bit, checksum_bit_count)
+    print(checksum, '<--- Checksum (hex to bits)')  # ensures length is checksum_bit_count so zero pad isn't dropped on small numbers
 
     print('Initial entropy + checksum = total bits:', str(entropy) + str(checksum))  # convert entropy to binary string
     print('Length of total bits:', len(str(entropy) + str(checksum)))  # print length of total bits
@@ -120,7 +125,7 @@ def pick_words(entropy, entropy_hash, checksum_bit_count):
 
     print('Optional backup hex:', entropy_hex)
 
-    totalbits = hex(int(str('0b') + str(entropy) + str(checksum), 2))
+    totalbits = hex(int(str('0b') + entropy + str(checksum), 2))
 
     print('Optional backup hex with checksum:', totalbits)
     print('Hash digest of initial entropy bytes:', entropy_hash)
@@ -140,6 +145,15 @@ def print_words(indices):
     words = [bip39wordlist[indices[i]] for i in range(0, len(indices))]
     word_string = ' '.join(words)
     print(word_string)
+
+
+def int_to_padded_binary(num, padding):
+    return bin(num)[2:].zfill(padding)
+
+
+def binary_to_padded_hex(bin, padding):
+    num = int(bin, 2)
+    return '0x{0:0{1}x}'.format(num, padding)
 
 
 bip39wordlist = [
