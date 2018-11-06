@@ -39,82 +39,81 @@ import binascii
 def main():
     entropy = generate_entropy()
     entropy_hash = get_hash(entropy)
-    padgroup = pick_words(entropy, entropy_hash)
-    print_words(padgroup)
+    indices = pick_words(entropy, entropy_hash)
+    print_words(indices)
 
 def generate_entropy():
-    ent_dec = format(secrets.randbits(130), '0129b')  # *get a minimum of x bits
-    ent_dec = ent_dec[:128]  # *use only bits required from the initial random number
-    print('Initial entropy:', ent_dec)  # print the entire string of bits to be used
-    print('Length of initial entropy:', len(ent_dec))  # print the length of the string
-    print('Initial entropy as hex:', hex(int(ent_dec, 2)))  # print initial string as hexidecimal base 16
-    print('Length of entropy as hex:', len((hex(int(ent_dec, 2)))))  # print length of hex string
-    return ent_dec
+    entropy = format(secrets.randbits(130), '0129b')  # *get a minimum of x bits
+    entropy = entropy[:128]  # *use only bits required from the initial random number
+    print('Initial entropy:', entropy)  # print the entire string of bits to be used
+    print('Length of initial entropy:', len(entropy))  # print the length of the string
+    print('Initial entropy as hex:', hex(int(entropy, 2)))  # print initial string as hexidecimal base 16
+    print('Length of entropy as hex:', len((hex(int(entropy, 2)))))  # print length of hex string
+    return entropy
 
 def get_hash(entropy):
-    ent_hex = (hex(int(entropy, 2)))  # assign hex string to ent_hex variable
+    entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
 
-    ent_hex_nopad = ent_hex[2:]  # removing leading 0x hex pad
+    entropy_hex_no_padding = entropy_hex[2:]  # removing leading 0x hex pad
 
-    print('Entropy length as hex without 0x pad:', len(ent_hex_nopad))  # prints length without 0x pad
+    print('Entropy length as hex without 0x pad:', len(entropy_hex_no_padding))  # prints length without 0x pad
     print('Initial entropy as hex without pad:', hex(int(entropy, 2))[2:])  # print string without 0x pad
 
-    array = bytearray.fromhex(ent_hex_nopad)  # *convert no padded hex string to bytearray
-    print(array, '<--- Entropy as bytes')  # print array as bytes in bytearray()
-    print('Length of initial entropy as bytearray:', len(array))  # print length of bytearray
+    entropy_bytearray = bytearray.fromhex(entropy_hex_no_padding)  # *convert no padded hex string to bytearray
+    print(entropy_bytearray, '<--- Entropy as bytes')  # print array as bytes in bytearray()
+    print('Length of initial entropy as bytearray:', len(entropy_bytearray))  # print length of bytearray
 
-    bits = hashlib.sha256(array).hexdigest()  # *compute the sha256 hash of the bytearray as a hex digest
+    bits = hashlib.sha256(entropy_bytearray).hexdigest()  # *compute the sha256 hash of the bytearray as a hex digest
     print(bits, '<--- SHA-256 hash digest of entropy bytes')  # print the hash digest of the bytearray
     return bits
 
 def pick_words(entropy, entropy_hash):
-    ent_hex = (hex(int(entropy, 2)))  # assign hex string to ent_hex variable
+    entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
     bit = entropy_hash[0:1]  # *take first x bit of bits (x is not defined but be added to slice manually)
 
     print(bit, '<--- Partial fragment of initial "byte" of hash')  # print first part of hash used for bits
     print((bit[0:1]), '<--- First n bits of hash to convert to hex')  # print needed bits from
 
-    checkb = (bin(int(bit, 16)))  # converts hex to binary
-    checksum = (format(int(checkb, 2), '04b'))
-    print(format(int(checkb, 2), '04b'), '<--- Checksum (hex to bits)')  # ensures length is 4 so zero pad isn't dropped on small numbers
+    check_bit = (bin(int(bit, 16)))  # converts hex to binary
+    checksum = (format(int(check_bit, 2), '04b'))
+    print(format(int(check_bit, 2), '04b'), '<--- Checksum (hex to bits)')  # ensures length is 4 so zero pad isn't dropped on small numbers
 
     print('Initial entropy + checksum = total bits:', str(entropy) + str(checksum))  # convert entropy to binary string
     print('Length of total bits:', len(str(entropy) + str(checksum)))  # print length of total bits
-    s = (entropy) + str(checksum)  # adds checksum to end of string lengthening it deterministically.
-    groups = [s[i:i + 11] for i in range(0, len(s), 11)]  # splits the total bits into groups of 11 bits at a time
+    source = str(entropy) + str(checksum)  # adds checksum to end of string lengthening it deterministically.
+    groups = [source[i:i + 11] for i in range(0, len(source), 11)]  # splits the total bits into groups of 11 bits at a time
     print(groups)  # final groups each representing a index value that corresponds to a word in the list.
 
-    print('Optional backup hex:', ent_hex)
+    print('Optional backup hex:', entropy_hex)
 
     totalbits = hex(int(str('0b') + str(entropy) + str(checksum), 2))
 
     print('Optional backup hex with checksum:', totalbits)
     print('Hash digest of initial entropy bytes:', entropy_hash)
 
-    # lookup = [s[i:i + 11] for i in range(0,len(s),11)]
-    padgroup = [int(str('0b') + s[i:i + 11], 2) for i in range(0, len(s), 11)]  # (str('0b') for i in range(0,len(s),11))
+    # lookup = [source[i:i + 11] for i in range(0,len(source),11)]
+    indices = [int(str('0b') + source[i:i + 11], 2) for i in range(0, len(source), 11)]  # (str('0b') for i in range(0,len(source),11))
     # print(int(groups[:11],base=2))
-    print(padgroup)
-    # print(bip39wordlist([padgroup]))
+    print(indices)
+    # print(bip39wordlist([indices]))
+    return indices
 
-    return padgroup
-
-def print_words(padgroup):
+def print_words(indices):
     # print(bip39wordlist)
     # print(len(bip39wordlist))
-    # wordindexes=for i in padgroup
-    First = padgroup[0]
-    Second = padgroup[1]
-    Third = padgroup[2]
-    Fourth = padgroup[3]
-    Fifth = padgroup[4]
-    Sixth = padgroup[5]
-    Seventh = padgroup[6]
-    Eigth = padgroup[7]
-    Ninth = padgroup[8]
-    Tenth = padgroup[9]
-    Eleventh = padgroup[10]
-    Twelfth = padgroup[11]
+    # wordindexes=for i in indices
+    First = indices[0]
+    Second = indices[1]
+    Third = indices[2]
+    Fourth = indices[3]
+    Fifth = indices[4]
+    Sixth = indices[5]
+    Seventh = indices[6]
+    Eigth = indices[7]
+    Ninth = indices[8]
+    Tenth = indices[9]
+    Eleventh = indices[10]
+    Twelfth = indices[11]
 
     print(bip39wordlist[First], bip39wordlist[Second], bip39wordlist[Third], bip39wordlist[Fourth], bip39wordlist[Fifth], bip39wordlist[Sixth], bip39wordlist[Seventh], bip39wordlist[Eigth], bip39wordlist[Ninth], bip39wordlist[Tenth], bip39wordlist[Eleventh], bip39wordlist[Twelfth])
 
