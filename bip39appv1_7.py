@@ -46,6 +46,7 @@ def main():
     indices = pick_words(entropy, entropy_hash, checksum_bit_count)
     print_words(indices)
 
+
 def ask_word_count():
     default_word_count = 12
     input_string = 'Enter word count: (12 or 24, default: {0}): '.format(default_word_count)
@@ -56,6 +57,7 @@ def ask_word_count():
     while word_count != 12 and word_count != 24:
         word_count = int(input(input_string))
     return word_count
+
 
 def ask_entropy(generated_bit_count):
     generated_char_count = generated_bit_count // 4
@@ -80,6 +82,7 @@ def generate_entropy(generated_bit_count):
     print('Length of entropy as hex:', len((hex(int(entropy, 2)))))  # print length of hex string
     return entropy
 
+
 def get_hash(entropy):
     entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
 
@@ -95,6 +98,7 @@ def get_hash(entropy):
     bits = hashlib.sha256(entropy_bytearray).hexdigest()  # *compute the sha256 hash of the bytearray as a hex digest
     print(bits, '<--- SHA-256 hash digest of entropy bytes')  # print the hash digest of the bytearray
     return bits
+
 
 def pick_words(entropy, entropy_hash, checksum_bit_count):
     entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
@@ -128,6 +132,7 @@ def pick_words(entropy, entropy_hash, checksum_bit_count):
     # print(bip39wordlist([indices]))
     return indices
 
+
 def print_words(indices):
     # print(bip39wordlist)
     # print(len(bip39wordlist))
@@ -135,6 +140,7 @@ def print_words(indices):
     words = [bip39wordlist[indices[i]] for i in range(0, len(indices))]
     word_string = ' '.join(words)
     print(word_string)
+
 
 bip39wordlist = [
     "abandon",
