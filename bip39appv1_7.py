@@ -37,14 +37,43 @@ import binascii
 
 
 def main():
-    entropy = generate_entropy()
+    word_count = ask_word_count()
+    checksum_bit_count = word_count // 3
+    total_bit_count = word_count * 11
+    generated_bit_count = total_bit_count - checksum_bit_count
+    entropy = ask_entropy(generated_bit_count)
     entropy_hash = get_hash(entropy)
-    indices = pick_words(entropy, entropy_hash)
+    indices = pick_words(entropy, entropy_hash, checksum_bit_count)
     print_words(indices)
 
-def generate_entropy():
-    entropy = format(secrets.randbits(130), '0129b')  # *get a minimum of x bits
-    entropy = entropy[:128]  # *use only bits required from the initial random number
+def ask_word_count():
+    default_word_count = 12
+    input_string = 'Enter word count: (12 or 24, default: {0}): '.format(default_word_count)
+    word_count_string = input(input_string)
+    if len(word_count_string) == 0:
+        return default_word_count
+    word_count = int(word_count_string)
+    while word_count != 12 and word_count != 24:
+        word_count = int(input(input_string))
+    return word_count
+
+def ask_entropy(generated_bit_count):
+    generated_char_count = generated_bit_count // 4
+    input_string = 'Enter entropy in the form of padded hex string of length {0} (leave empty to generate): '.format(generated_char_count)
+    entropy_string = input(input_string)
+    if len(entropy_string) == 0:
+        return generate_entropy(generated_bit_count)
+    while len(entropy_string) != generated_char_count + 2:
+        entropy_string = input(input_string)
+    entropy_binary = bin(int(entropy_string, 16))[2:].zfill(generated_bit_count)
+    print(entropy_binary)
+    return entropy_binary
+
+
+def generate_entropy(generated_bit_count):
+    print(generated_bit_count)
+    entropy = format(secrets.randbits(generated_bit_count + 2), '0129b')  # *get a minimum of x bits
+    entropy = entropy[:generated_bit_count]  # *use only bits required from the initial random number
     print('Initial entropy:', entropy)  # print the entire string of bits to be used
     print('Length of initial entropy:', len(entropy))  # print the length of the string
     print('Initial entropy as hex:', hex(int(entropy, 2)))  # print initial string as hexidecimal base 16
@@ -67,12 +96,13 @@ def get_hash(entropy):
     print(bits, '<--- SHA-256 hash digest of entropy bytes')  # print the hash digest of the bytearray
     return bits
 
-def pick_words(entropy, entropy_hash):
+def pick_words(entropy, entropy_hash, checksum_bit_count):
     entropy_hex = (hex(int(entropy, 2)))  # assign hex string to entropy_hex variable
-    bit = entropy_hash[0:1]  # *take first x bit of bits (x is not defined but be added to slice manually)
+    checksum_char_count = checksum_bit_count // 4
+    bit = entropy_hash[0:checksum_char_count]  # *take first x bit of bits (x is not defined but be added to slice manually)
 
     print(bit, '<--- Partial fragment of initial "byte" of hash')  # print first part of hash used for bits
-    print((bit[0:1]), '<--- First n bits of hash to convert to hex')  # print needed bits from
+    print((bit[0:checksum_char_count]), '<--- First n bits of hash to convert to hex')  # print needed bits from
 
     check_bit = (bin(int(bit, 16)))  # converts hex to binary
     checksum = (format(int(check_bit, 2), '04b'))
@@ -102,7 +132,7 @@ def print_words(indices):
     # print(bip39wordlist)
     # print(len(bip39wordlist))
     # wordindexes=for i in indices
-    words = [bip39wordlist[indices[i]] for i in range(0, 12)]
+    words = [bip39wordlist[indices[i]] for i in range(0, len(indices))]
     word_string = ' '.join(words)
     print(word_string)
 
