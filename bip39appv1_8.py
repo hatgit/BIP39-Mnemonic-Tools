@@ -2,7 +2,7 @@
 '''
 Author: Steven Hatzakis @ 2018
 
-Version 1.7 beta
+Version 1.8 beta
 
 Description: A simplified python program for generating
 valid bip39 mnemonics, using an initial random entropy via the
