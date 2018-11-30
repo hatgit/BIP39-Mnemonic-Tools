@@ -50,25 +50,26 @@ def main():
 def ask_word_count():
     default_word_count = 12
     input_string = 'Enter word count: (12 or 24, default: {0}): '.format(default_word_count)
-    word_count_string = input(input_string)
-    if len(word_count_string) == 0:
-        return default_word_count
-    word_count = int(word_count_string)
-    while word_count != 12 and word_count != 24:
-        word_count = int(input(input_string))
-    return word_count
+    while True:
+        word_count_string = input(input_string)
+        if len(word_count_string) == 0:
+            return default_word_count
+        word_count = int(word_count_string)
+        if word_count == 12 or word_count == 24:
+            return word_count
 
 
 def ask_entropy(generated_bit_count):
     generated_char_count = generated_bit_count // 4
     input_string = 'Enter entropy in the form of padded hex string of length {0} (leave empty to generate): '.format(generated_char_count)
-    entropy_string = input(input_string)
-    if len(entropy_string) == 0:
-        return generate_entropy(generated_bit_count)
-    while len(entropy_string) != generated_char_count + 2:
+    while True:
         entropy_string = input(input_string)
-    entropy_binary = int_to_padded_binary(int(entropy_string, 16), generated_bit_count)
-    return entropy_binary
+        entropy_len = len(entropy_string)
+        if entropy_len == 0:
+            return generate_entropy(generated_bit_count)
+        if entropy_len == generated_char_count + 2:
+            entropy_binary = int_to_padded_binary(int(entropy_string, 16), generated_bit_count)
+            return entropy_binary
 
 
 def generate_entropy(generated_bit_count):
