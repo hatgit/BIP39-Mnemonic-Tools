@@ -1,8 +1,11 @@
+### COPY FOR USE IN PALINDROMIC MNEMONIC EXPERIMENT###
+
+
 # bip39 Valid Mnemonic Generator Python App
 '''
 Author: Steven Hatzakis @ 2018
 
-Version 1.7 beta
+Version 1.8 beta
 
 Description: A simplified python program for generating
 valid bip39 mnemonics, using an initial random entropy via the
@@ -815,7 +818,7 @@ bip39wordlist = [
     "faint",
     "faith",
     "fall",
-    "FALSE",
+    "false",
     "fame",
     "family",
     "famous",
@@ -2023,7 +2026,7 @@ bip39wordlist = [
     "trophy",
     "trouble",
     "truck",
-    "TRUE",
+    "true",
     "truly",
     "trumpet",
     "trust",
