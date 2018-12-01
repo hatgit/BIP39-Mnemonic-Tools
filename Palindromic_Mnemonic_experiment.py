@@ -40,38 +40,77 @@ import binascii
 
 
 def main():
+    palindromic = False
+    first_time_entropy = True
+    count_mnemonic = 0
     word_count = ask_word_count()
     checksum_bit_count = word_count // 3
     total_bit_count = word_count * 11
     generated_bit_count = total_bit_count - checksum_bit_count
     entropy = ask_entropy(generated_bit_count)
-    entropy_hash = get_hash(entropy)
-    indices = pick_words(entropy, entropy_hash, checksum_bit_count)
-    print_words(indices)
+    while not palindromic:
+        if first_time_entropy:
+            first_time_entropy = False
+        else:
+            entropy = generate_entropy(generated_bit_count)
+        count_mnemonic += 1
+        print("\nMnemonic number " + str(count_mnemonic))
+        entropy_hash = get_hash(entropy)
+        indices,groups = pick_words(entropy, entropy_hash, checksum_bit_count)
+        print_words(indices)
+
+        # Palindromic phase
+        # get the last 4/8 bits of the first word in regular order
+        checksum_to_compare = groups[0][11-checksum_bit_count:]
+        print(checksum_to_compare, '<--- Last ' + str(checksum_bit_count) + ' bits of the first word to compare with checksum of mnemonic reverse order (hex to bits)')
+        print("Palindromic mnemonic phase")
+        groups_reverse = groups[::-1]
+        print(groups_reverse)
+        indices_reverse = indices[::-1]
+        print_words(indices_reverse)
+        join_groups = ''.join(groups_reverse)
+        print('Words reverse order = total bits:', join_groups)
+        words_reverse_order = join_groups[:-checksum_bit_count]
+        print('Words reverse order without last ' + str(checksum_bit_count) + ' bits = total bits:', words_reverse_order)
+        words_reverse_hash = get_hash(words_reverse_order)
+        checksum_char_count = checksum_bit_count // 4
+        bit = words_reverse_hash[0:checksum_char_count]
+        print(bit, '<--- Partial fragment of initial "byte" of hash')  # print first part of hash used for bits
+        print((bit[0:checksum_char_count]), '<--- First n bits of hash to convert to hex')  # print needed bits from
+        check_bit = int(bit, 16)  # converts hex to binary
+        checksum_reverse = int_to_padded_binary(check_bit, checksum_bit_count)
+        print(checksum_reverse, '<--- Checksum reverse order (hex to bits)')
+        if(checksum_to_compare == checksum_reverse):
+            print(checksum_to_compare + " is equal to " + checksum_reverse + ". It is a palindromic mnemonic")
+            print("It has been found after " + str(count_mnemonic) + " mnemonics" )
+            palindromic = True
+        else:
+            print(checksum_to_compare + " is not equal to " + checksum_reverse + ". It is not a palindromic mnemonic")
 
 
 def ask_word_count():
     default_word_count = 12
     input_string = 'Enter word count: (12 or 24, default: {0}): '.format(default_word_count)
-    word_count_string = input(input_string)
-    if len(word_count_string) == 0:
-        return default_word_count
-    word_count = int(word_count_string)
-    while word_count != 12 and word_count != 24:
-        word_count = int(input(input_string))
-    return word_count
+    while True:
+        word_count_string = input(input_string)
+        if len(word_count_string) == 0:
+            return default_word_count
+        word_count = int(word_count_string)
+        if word_count == 12 or word_count == 24:
+            return word_count
 
 
 def ask_entropy(generated_bit_count):
     generated_char_count = generated_bit_count // 4
     input_string = 'Enter entropy in the form of padded hex string of length {0} (leave empty to generate): '.format(generated_char_count)
-    entropy_string = input(input_string)
-    if len(entropy_string) == 0:
-        return generate_entropy(generated_bit_count)
-    while len(entropy_string) != generated_char_count + 2:
+    while True:
         entropy_string = input(input_string)
-    entropy_binary = int_to_padded_binary(int(entropy_string, 16), generated_bit_count)
-    return entropy_binary
+        entropy_len = len(entropy_string)
+        if entropy_len == 0:
+            return generate_entropy(generated_bit_count)
+        if entropy_len == generated_char_count + 2:
+            entropy_binary = int_to_padded_binary(int(entropy_string, 16), generated_bit_count)
+            return entropy_binary
 
 
 def generate_entropy(generated_bit_count):
@@ -138,8 +177,7 @@ def pick_words(entropy, entropy_hash, checksum_bit_count):
     # print(int(groups[:11],base=2))
     print(indices)
     # print(bip39wordlist([indices]))
-    return indices
-
+    return indices,groups
 
 def print_words(indices):
     # print(bip39wordlist)
