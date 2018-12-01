@@ -41,12 +41,20 @@ import binascii
 
 def main():
     palindromic = False
+    first_time_entropy = True
+    count_mnemonic = 0
+    word_count = ask_word_count()
+    checksum_bit_count = word_count // 3
+    total_bit_count = word_count * 11
+    generated_bit_count = total_bit_count - checksum_bit_count
+    entropy = ask_entropy(generated_bit_count)
     while not palindromic:
-        word_count = ask_word_count()
-        checksum_bit_count = word_count // 3
-        total_bit_count = word_count * 11
-        generated_bit_count = total_bit_count - checksum_bit_count
-        entropy = ask_entropy(generated_bit_count)
+        if first_time_entropy:
+            first_time_entropy = False
+        else:
+            entropy = generate_entropy(generated_bit_count)
+        count_mnemonic += 1
+        print("\nMnemonic number " + str(count_mnemonic))
         entropy_hash = get_hash(entropy)
         indices,groups = pick_words(entropy, entropy_hash, checksum_bit_count)
         print_words(indices)
@@ -74,6 +82,7 @@ def main():
         print(checksum_reverse, '<--- Checksum reverse order (hex to bits)')
         if(checksum_to_compare == checksum_reverse):
             print(checksum_to_compare + " is equal to " + checksum_reverse + ". It is a palindromic mnemonic")
+            print("It has been found after " + str(count_mnemonic) + " mnemonics" )
             palindromic = True
         else:
             print(checksum_to_compare + " is not equal to " + checksum_reverse + ". It is not a palindromic mnemonic")
