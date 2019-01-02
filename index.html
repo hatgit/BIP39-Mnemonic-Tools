@@ -142,7 +142,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
                 firstTimeEntropy = false
             } else {
                 if(countMnemonic==1) {
-                  alert('The first attempt to find a palindromic mnemonic has failed, from now it runs generating random entropy until find a valid palindromic')
+                  alert('The first attempt to find a palindromic mnemonic has failed, the application will now continue generating random entropy until it finds a valid palindromic mnemonic.')
                 }
                 entropyPal = generateEntropy(generatedBitCount)
             }
@@ -2393,7 +2393,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
       <option value=12>12</option>
       <option value=24>24</option>
     </select>
-    <p>Insert entropy in the form of padded hex string of length 32 (12 words) or 64 (24 words) (optional) :</p>
+    <p>Insert entropy in the form of a 0x-padded hex string of length 32 (for 12 words) or 64 (for 24 words) (optional) :</p>
     <input id="entropy">
     <br>
     <br>
@@ -2408,7 +2408,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
       <option value=12>12</option>
       <option value=24>24</option>
     </select>
-    <p>Insert entropy in the form of padded hex string of length 32 (12 words) or 64 (24 words) (optional) :</p>
+    <p>Insert entropy in the form of a 0x-padded hex string of length 32 (for 12 words) or 64 (for 24 words) (optional) :</p>
     <input id="entropyPal">
     <br>
     <br>
