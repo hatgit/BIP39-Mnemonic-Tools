@@ -108,10 +108,10 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         const totalBitCount = wordCount * 11
         const generatedBitCount = totalBitCount - checksumBitCount
         const generatedCharCount = Math.floor(generatedBitCount/4)
-        if(entropy.length == 0) {
-          entropy = generateEntropy(generatedBitCount)
-        } else if(entropy.length == generatedCharCount + 2) {
-          entropy = intToPaddedBinary(parseInt(entropy, 16), generatedBitCount)
+        entropy = checkEntropy(entropy, generatedBitCount, generatedCharCount)
+        if(entropy == null) {
+          alert('check the correctness of entropy inserted and generate again.')
+          return
         }
         const entropyWithChecksum = getHash(entropy, generatedCharCount, checksumBitCount)
         const words = pickWords(entropyWithChecksum)
@@ -130,10 +130,10 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         const totalBitCount = wordCountPal * 11
         const generatedBitCount = totalBitCount - checksumBitCount
         const generatedCharCount = Math.floor(generatedBitCount/4)
-        if(entropyPal.length == 0) {
-            entropyPal = generateEntropy(generatedBitCount)
-        } else if(entropyPal.length == generatedCharCount + 2) {
-            entropyPal = intToPaddedBinary(parseInt(entropyPal, 16), generatedBitCount)
+        entropyPal = checkEntropy(entropyPal, generatedBitCount, generatedCharCount)
+        if(entropyPal == null) {
+            alert('check the correctness of entropy inserted and generate again.')
+            return
         }
         while(!palindromic) {
             outputPal = ''
@@ -142,7 +142,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
                 firstTimeEntropy = false
             } else {
                 if(countMnemonic==1) {
-                  alert('The first attempt to find a palindromic mnemonic has failed, from now it runs until find a palindromic')
+                  alert('The first attempt to find a palindromic mnemonic has failed, from now it runs generating random entropy until find a valid palindromic')
                 }
                 entropyPal = generateEntropy(generatedBitCount)
             }
@@ -168,6 +168,22 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
             }
         }
 
+    }
+
+    function checkEntropy(entropy, generatedBitCount, generatedCharCount) {
+        if(entropy.length == 0) {
+            entropy = generateEntropy(generatedBitCount)
+        } else if(entropy.length == generatedCharCount + 2 && entropy.slice(0,2) == '0x') {
+            // skip 0x char in entropy
+            var entropyBinaryTemp = hexStringToBinaryString(entropy.slice(2))
+            entropy = binaryStringToByteArray(entropyBinaryTemp)
+            if(entropyBinaryTemp.includes('NaN')) {
+                return null
+            }
+        } else {
+            return null
+        }
+        return entropy
     }
 
     function addWordsToOutput(words) {
@@ -303,10 +319,6 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
             result.push(bip39wordlist[idx]);
         }
         return result
-    }
-
-    function intToPaddedBinary(num, padding) {
-        return num.toString(2).slice(2).zfill(padding)
     }
 
     function clearClassic() {
@@ -2381,7 +2393,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
       <option value=12>12</option>
       <option value=24>24</option>
     </select>
-    <p>Insert entropy in the form of padded hex string of length 32 (optional) :</p>
+    <p>Insert entropy in the form of padded hex string of length 32 (12 words) or 64 (24 words) (optional) :</p>
     <input id="entropy">
     <br>
     <br>
@@ -2396,7 +2408,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
       <option value=12>12</option>
       <option value=24>24</option>
     </select>
-    <p>Insert entropy in the form of padded hex string of length 32 (optional) :</p>
+    <p>Insert entropy in the form of padded hex string of length 32 (12 words) or 64 (24 words) (optional) :</p>
     <input id="entropyPal">
     <br>
     <br>
