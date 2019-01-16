@@ -251,7 +251,7 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
     function binaryStringToByteArray(data) {
         var byteArray = []
         for(var i=0; i<data.length; i=i+8) {
-          byteArray.push(parseInt(data.slice(i,i+11),2))
+          byteArray.push(parseInt(data.slice(i,i+8),2))
         }
         return byteArray
     }
