@@ -4,9 +4,9 @@ Simple Python and Javascript-based programs for generating valid BIP39 mnemonics
 
 This repository currently contains three separate tools, which consist of two Python (.py) files and one Javascript-based app that is wrapped in an .html file: 
 
-> https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/bip39appv1_8.py
-> https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/Palindromic_Mnemonic_Tool.py
-> https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/Palindromic-Mnemonic-Tool.html
+> (https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/bip39appv1_8.py)
+> (https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/Palindromic_Mnemonic_Tool.py)
+> (https://github.com/hatgit/BIP39-Mnemonic-Tools/blob/master/Palindromic-Mnemonic-Tool.html)
 
 
 **Description**: 
