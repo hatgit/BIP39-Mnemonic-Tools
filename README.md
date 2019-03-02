@@ -2,7 +2,7 @@
 Simple python and javascript programs for generating valid BIP39 mnemonics, including reversible 'palindromic' mnemonics (i.e. recovery phrases) that are BIP-39 compliant in terms of security, wordlist, and checksum, and that can be used offline as standalone applications (internet-less) without the need of an internet connection or third-party libraries, as all code is contained inline within the singular file (either python file or html file).
 
 
-Description: 
+**Description**: 
 Simplified Python and Javascript programs for generating
 valid bip39 mnemonics, using an initial random entropy via the
 secrets module in Python for cryptographically secure entropy (for the Python-related .py files), and the Web3 Cryptography API 
