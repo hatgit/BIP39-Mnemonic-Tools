@@ -32,9 +32,9 @@ The resulting words can be used as valid BIP39 mnemonic recovery phrases for rel
 crypto wallets, and because these apps are early stage and under experimental development, they should be checked against more established tools, in order to confirm that a given entropy maps correctly to its resulting mnemonic words. 
 
 The general formula followed in the creation of BIP39-compliant mnemonics is as follows: 
-Initial Entropy in bits /32 = checksum length in bits  (this is equal to wordcount/3 == checksum length)
-initial entropy mod 11 = remaining bits + checksum = last word
-Initial entropy + checksum = total bits /11 = total words. (total words can be either 12 or 24, depending on initial entropy length)
+<`Initial Entropy in bits /32 = checksum length in bits  (this is equal to wordcount/3 == checksum length)`
+<`Initial entropy mod 11 = remaining bits + checksum = last word`
+<`Initial entropy + checksum = total bits /11 = total words. (total words can be either 12 or 24, depending on initial entropy length)`
 
 |                |12-word mnemonic               |24-word mnemonic             |
 |----------------|-------------------------------|-----------------------------|
