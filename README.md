@@ -1,6 +1,6 @@
 ## BIP39 Mnemonic Tools
 
-Simple python and javascript programs for generating valid BIP39 mnemonics, including reversible 'palindromic' mnemonics (i.e. recovery phrases) that are BIP-39 compliant in terms of security, wordlist, and checksum, and that can be used offline as standalone applications (internet-less) without the need of an internet connection or third-party libraries, as all code is contained inline within the singular file (either python file or html file). This repository currently contains three separate tools, which consist of two Python (.py) files and one Javascript-based that is wrapped in a .html file
+Simple Python and Javascript-based programs for generating valid BIP39 mnemonics, including reversible 'palindromic' mnemonics (i.e. recovery phrases) that are BIP-39 compliant in terms of security, wordlist, and checksum, and that can be used offline as standalone applications (internet-less) without the need of an internet connection or third-party libraries, as all code is contained inline within the singular file (either python file or html file). This repository currently contains three separate tools, which consist of two Python (.py) files and one Javascript-based app that is wrapped in an .html file. 
 
 **Description**: 
 Simplified Python and Javascript programs for generating
