@@ -26,7 +26,7 @@ for a total of 132 bits, that will result in 12 final words. A user can choose f
 
 Note: The palindromic 'reversible' mnemonics are simply regular BIP39-compliant ones that happen to also have the ability to reverse the order of their words and still be BIP39-compliant, this is only possible for certain mnemonics that meet specific criteria, and the author does not believe that there is any security loss for these reversible ones, as one would still need to brute-force the range of valid mnemonics in order to find ones that are also reversible.  
 
-
+<img width="1027" alt="BIP39 HTML Tool Palindromic Mnemonic Phase" src="https://user-images.githubusercontent.com/5213035/53685387-cdd65b00-3ce7-11e9-8e78-4225c89d72c5.png">
 
 
 
