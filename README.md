@@ -21,6 +21,8 @@ This repository currently contains three separate tools, which consist of two Py
 
 
 **Description**: 
+
+
 Simplified Python and Javascript programs for generating
 valid bip39 mnemonics, using an initial random entropy via the
 secrets module in Python for cryptographically secure entropy (for the Python-related .py files), and the Web3 Cryptography API (for the Javascript-based .html files) then revealing the entropy in its various formats including hex, as a binary string, and as a bytearray before hashing with the SHA256 algorithm to obtain the leading required
