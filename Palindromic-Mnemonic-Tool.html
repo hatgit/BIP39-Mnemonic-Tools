@@ -64,6 +64,7 @@ null!=d[3]?b[d[2]]=parseInt(d[3],10):null!=d[4]?b[d[2]]=d[2].match(/^(ct|adata|s
 b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return c}};sjcl.encrypt=sjcl.json.encrypt;sjcl.decrypt=sjcl.json.decrypt;sjcl.misc.pa={};sjcl.misc.cachedPbkdf2=function(a,b){var c=sjcl.misc.pa,d;b=b||{};d=b.iter||1E3;c=c[a]=c[a]||{};d=c[d]=c[d]||{firstSalt:b.salt&&b.salt.length?b.salt.slice(0):sjcl.random.randomWords(2,0)};c=void 0===b.salt?d.firstSalt:b.salt;d[c]=d[c]||sjcl.misc.pbkdf2(a,c,b.iter);return{key:d[c].slice(0),salt:c.slice(0)}};
 "undefined"!==typeof module&&module.exports&&(module.exports=sjcl);"function"===typeof define&&define([],function(){return sjcl});
     </script>
+    <script src='./bignumber.js'></script>
     <script type="text/javascript">
     // bip39 Valid Mnemonic Generator Javascript App
     /*
@@ -104,7 +105,9 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         const wordCount = document.getElementById('wordLength').value;
         addElementToOutput('Number of mnemonic words:',wordCount)
         var entropy = document.getElementById('entropy').value;
+        console.log(entropy+ 'init entropy')
         const checksumBitCount = Math.floor(wordCount/3)
+	   
         const totalBitCount = wordCount * 11
         const generatedBitCount = totalBitCount - checksumBitCount
         const generatedCharCount = Math.floor(generatedBitCount/4)
@@ -113,16 +116,27 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
           alert('check the correctness of entropy inserted and generate again.')
           return
         }
+        console.log(TestHash(entropy, generatedCharCount, checksumBitCount))
+        while(TestHash(entropy, generatedCharCount, checksumBitCount)===false){
+            console.log(TestHash(entropy, generatedCharCount, checksumBitCount))
+            entropy = generateEntropy(generatedBitCount)
+            if(entropy == null) {
+                alert('check the correctness of entropy inserted and generate again.')
+                return
+             }
+        }
         const entropyWithChecksum = getHash(entropy, generatedCharCount, checksumBitCount)
         const words = pickWords(entropyWithChecksum)
         output += 'mnemonic is valid.<br />'
         output = addWordsToOutput(words) + output
         document.getElementById('output').innerHTML = output;
     }
-
+   
     function generateBIP39Palindromic() {
         var palindromic = false
         var firstTimeEntropy = true
+        
+        
         var countMnemonic = 0
         const wordCountPal = document.getElementById('wordLengthPal').value;
         var entropyPal = document.getElementById('entropyPal').value;
@@ -255,6 +269,15 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         }
         return byteArray
     }
+    function HexstringToByteArray(data) {
+        var byteArray = []
+        
+        for(var i=0; i<data.length; i=i+2) {
+           // console.log(data.slice(i,i+2))  
+          byteArray.push(parseInt(data.slice(i,i+2),16))
+        }
+        return byteArray
+    }
 
     // Pad a numeric string on the left with zero digits until the given width
     // is reached.
@@ -277,23 +300,32 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
     }
 
     function getHash(entropyBytearray, generatedCharCount, checksumBitCount, mode='classic') {
+       
         const entropyBinary = byteArrayToBinaryString(entropyBytearray)
         const data = byteArrayToWordArray(entropyBytearray)
+        
         const hexData = '0x' + sjcl.codec.hex.fromBits(data)
         const hexDataNoPadding = hexData.slice(2)
-        // sha256
         const hash = sjcl.hash.sha256.hash(data)
         const hashHex = sjcl.codec.hex.fromBits(hash)
+        //console.log(hexData)
+        //console.log(hashHex)
+       // console.log(entropyBinary)
+    
         const c = zfill(hexStringToBinaryString(hashHex), 256)
         const checksum = c.substring(0, entropyBytearray.length * 8 / 32)
+        
         const checksumCharCount = Math.floor(checksumBitCount/4)
         const bit = hashHex.slice(0,checksumCharCount)
         // final entropy + checksum bits
         const b = entropyBinary + checksum;
+        const hatNotation= base64en(b)
+       
         addElementToOutput('Initial entropy:', entropyBinary, mode)
         addElementToOutput('Length of initial entropy:', entropyBinary.length, mode)
         addElementToOutput('Initial entropy as hex:', hexData, mode)
         addElementToOutput('Length of entropy as hex:', hexData.length, mode)
+        addElementToOutput('Entropy as Base64:', hatNotation, mode)
         addElementToOutput('gcc:', generatedCharCount, mode)
         addElementToOutput('Entropy length as hex without 0x pad:', hexDataNoPadding.length, mode)
         addElementToOutput('Initial entropy as hex without pad:', hexDataNoPadding, mode)
@@ -310,7 +342,86 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         addElementToOutput('Hash digest of initial entropy bytes:', hashHex, mode)
         return b
     }
-
+    function TestHash(entropyBytearray, generatedCharCount, checksumBitCount, mode='classic') {
+        
+        const entropyBinary = byteArrayToBinaryString(entropyBytearray)
+        const data = byteArrayToWordArray(entropyBytearray)
+       
+        const hexData = '0x' + sjcl.codec.hex.fromBits(data)
+        const hexDataNoPadding = hexData.slice(2)
+        const hash = sjcl.hash.sha256.hash(data)
+        const hashHex = sjcl.codec.hex.fromBits(hash)
+        //console.log(hexData)
+        //console.log(hashHex)
+       // console.log(entropyBinary)
+       
+        const c = zfill(hexStringToBinaryString(hashHex), 256)
+        const checksum = c.substring(0, entropyBytearray.length * 8 / 32)
+       
+        const checksumCharCount = Math.floor(checksumBitCount/4)
+        const bit = hashHex.slice(0,checksumCharCount)
+        // final entropy + checksum bits
+        const b = entropyBinary + checksum;
+        const hatNotation= base64en(b)
+        console.log(hatNotation)
+        const bool=(hatNotation.length===22)
+        console.log(bool)
+        return bool
+        
+    }
+    function getDecodedhash(entropyBytearray, generatedCharCount, checksumBitCount, mode='classic'){
+        console.log(generatedCharCount)
+        console.log(entropyBytearray)
+        console.log(checksumBitCount)
+        const entropyBinary = byteArrayToBinaryString(entropyBytearray)
+        const data = byteArrayToWordArray(entropyBytearray)
+        const hexData = '0x' + sjcl.codec.hex.fromBits(data)
+        const hexDataNoPadding = hexData.slice(2)
+        // sha256
+        const hash = sjcl.hash.sha256.hash(data)
+        const hashHex = sjcl.codec.hex.fromBits(hash)
+        //console.log(hexData)
+        //console.log(hashHex)
+       // console.log(entropyBinary)
+       
+        const c = zfill(hexStringToBinaryString(hashHex), 256)
+        const checksum = c.substring(0, entropyBytearray.length * 8 / 32)
+        const checksumCharCount = Math.floor(checksumBitCount/4)
+        const bit = hashHex.slice(0,checksumCharCount)
+        // final entropy + checksum bits
+        const b = entropyBinary + checksum;
+        
+      
+        return b
+    }
+    function Decrypt(){
+        var entropy64 = document.getElementById('base64entropy').value;
+        
+        var hex=decodeAsHex(entropy64)
+        var bin=decodeAsBin(entropy64)
+        console.log(hex.length+'hex length')
+        if(hex.length>32){
+            
+            var words=pickWords(bin) 
+            console.log(words)
+        document.getElementById('result').innerHTML=words
+        } 
+        else{
+        var bytes=HexstringToByteArray(hex)
+        var wordCount=12
+        const checksumBitCount = Math.floor(wordCount/3)
+	   
+        const totalBitCount = wordCount * 11
+        const generatedBitCount = totalBitCount - checksumBitCount
+        const generatedCharCount = Math.floor(generatedBitCount/4)
+        const entropyWithChecksum = getDecodedhash(bytes, generatedCharCount, checksumBitCount)
+        var words=pickWords(entropyWithChecksum) 
+            
+        document.getElementById('result').innerHTML=words
+        }
+        
+       
+    }
     function pickWords(entropyHash) {
         var result = [];
         const blen = entropyHash.length / 11;
@@ -367,8 +478,8 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         "adjust",
         "admit",
         "adult",
-        "advance",
-        "advice",
+        "advance",   
+        "advice",   
         "aerobic",
         "affair",
         "afford",
@@ -2385,6 +2496,130 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
         "zone",
         "zoo"
     ]
+    const base64library=["0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "A",
+    "B",
+    "C",
+    "D",
+    "E",
+    "F",
+    "G",
+    "H",
+    "I",
+    "J",
+    "K",
+    "L",
+    "M",
+    "N",
+    "O",
+    "P",
+    "Q",
+    "R",
+    "S",
+    "T",
+    "U",
+    "V",
+    "W",
+    "X",
+    "Y",
+    "Z",
+    "!",
+    '"',
+    "#",
+    "$",
+    "%",
+    "&",
+    "'",
+    "(",
+    ")",
+    "*",
+    "+",
+    ",",
+    "-",
+    ".",
+    "{",
+    ":",
+    ";",
+    "<",
+    "=",
+    ">",
+    "?",
+    "@",
+    "[",
+    "}",
+    "]",
+    "^",
+    "_",
+    "`"]
+    var b64dict= {};
+    for(var i=0;i<base64library.length;i++) {
+        b64dict[base64library[i]] = i;
+    }
+
+    
+
+    function decodeAsBin(string) {
+        var output = [];
+        var s='';
+        for(var j=0;j<string.length;j++) {
+            if(string[j] != ' ') {
+                console.log(string[j] +'symbol '+j)
+                console.log(zfill(b64dict[string[j].toUpperCase()].toString(2)))
+                console.log(zfill(b64dict[string[j].toUpperCase()].toString(2), 6))
+                output.push(zfill(b64dict[string[j].toUpperCase()].toString(2), 6));
+            }
+        }
+        return output.join('');
+    }
+
+    function decodeAsHex(string) {
+    var bin = decodeAsBin(string);
+    console.log(bin+ 'bin')
+    var output = [];
+    var s='';
+    // Pad with 0 for binaries not divisible by 4, for hex conversion
+    var binModule = bin.length % 4;
+    console.log(binModule+'aofijeow***********************************************************************************************************************')
+    if(binModule != 0) {
+        bin = zfill(bin, bin.length + 4 - binModule);
+    }
+    for(var i=0;i<bin.length;i=i+4) {
+        console.log(parseInt(bin.slice(i,i+4), 2).toString(16)+ 'first character')
+        output.push(parseInt(bin.slice(i,i+4), 2).toString(16));
+    }
+    return output.join('');
+    }
+
+    function base64en(address_hex) {  // important never to rename base64en to "base64" which can corrupt the Python installation.
+    // (renamed alphabet to base64library below) alphabet = string.digits+string.ascii_uppercase+string.punctuation
+    
+    var b64_string = '';
+    // Convert hex to decimal
+    var x= new BigNumber(address_hex,2);
+    
+    // Append digits to the start of string
+    
+
+    while(x > 0) {
+       var digit = x.mod(64)
+	     //console.log(digit,'digit')
+       var digit_char = base64library[digit];
+         b64_string = digit_char + b64_string;
+        x =x.idiv(64)  ;
+	    //console.log(x,'new address int')    
+    }
+    return b64_string;
+}
+
 
     </script>
   </head>
@@ -2419,5 +2654,11 @@ b){var c={},d;for(d=0;d<b.length;d++)void 0!==a[b[d]]&&(c[b[d]]=a[b[d]]);return 
      <br>
      <br>
      <div id='outputPal'></div>
+     <h2>Decode Base64 Entropy </h2>
+     <input id="base64entropy">
+     <button onclick="Decrypt()"> Get Seed Words</button>
+     <br>
+     <p id='result'></p>
+     <br>
   </body>
 </html>
